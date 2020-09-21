@@ -121,7 +121,7 @@ class _PaymentState extends State<Payment> {
                   onPressed: () => Navigator.popAndPushNamed(
                       context, PageRoutes.pickupAssigned),
                 ),
-              )
+              ),
             ],
           ),
         ),

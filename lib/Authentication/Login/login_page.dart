@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:fz_courier/Authentication/signin_navigator.dart';
 import 'package:fz_courier/Components/continue_button.dart';
 import 'package:fz_courier/Components/entry_field.dart';
@@ -17,12 +18,28 @@ class LoginBody extends StatefulWidget {
 }
 
 class _LoginBodyState extends State<LoginBody> {
+  final _mobileNumberController = TextEditingController();
+  final _scaffold = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    Firebase.initializeApp();
+  }
+
+  void _showMessage(String message) {
+    _scaffold.currentState.showSnackBar(SnackBar(
+      content: Text(message),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     var locale = AppLocalizations.of(context);
     var mediaQuery = MediaQuery.of(context);
     var theme = Theme.of(context);
     return Scaffold(
+      key: _scaffold,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
@@ -60,19 +77,31 @@ class _LoginBodyState extends State<LoginBody> {
                         hint: locale.selectCountryFromList,
                         suffixIcon: Icons.arrow_drop_down,
                         readOnly: true,
+                        initialValue: "+91",
                       ),
                       EntryField(
                         label: locale.phoneText,
                         hint: locale.phoneHint,
                         keyboardType: TextInputType.number,
+                        controller: _mobileNumberController,
+                        maxLength: 10,
                       ),
                       SizedBox(height: 16.0),
                       CustomButton(
                         radius: BorderRadius.only(
                             topLeft: Radius.circular(35.0),
                             bottomRight: Radius.circular(35.0)),
-                        onPressed: () =>
-                            Navigator.pushNamed(context, SignInRoutes.signUp),
+                        onPressed: () {
+                          if(_mobileNumberController.text.length < 10){
+                            _showMessage("Invalid mobile number!");
+                            return;
+                          }
+                          Navigator.pushNamed(
+                            context,
+                            SignInRoutes.signUp,
+                            arguments: _mobileNumberController.text,
+                          );
+                        },
                       ),
                       Text('\n' + locale.signinOTP,
                           textAlign: TextAlign.center,
